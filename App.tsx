@@ -1,16 +1,28 @@
 
 import React, { useState, useEffect } from 'react';
-import { Screen, QuizResult, AIResponse } from './types';
-import { QUESTIONS, CHARACTER_IMAGES } from './constants';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Screen, QuizResult } from './types';
+import { CHARACTER_IMAGES } from './constants';
 import { analyzeQuizResults } from './geminiService';
 
-// Component Imports (Defined below in the same file for simplicity as per requirements)
 import Landing from './components/Landing';
 import Home from './components/Home';
 import Quiz from './components/Quiz';
 import NameEntry from './components/NameEntry';
 import Result from './components/Result';
 import History from './components/History';
+
+const screenVariants = {
+  initial: { opacity: 0, x: 20 },
+  animate: { opacity: 1, x: 0 },
+  exit: { opacity: 0, x: -20 },
+};
+
+const springTransition = {
+  type: "spring",
+  stiffness: 300,
+  damping: 30,
+};
 
 const App: React.FC = () => {
   const [currentScreen, setCurrentScreen] = useState<Screen>(Screen.LANDING);
@@ -20,7 +32,6 @@ const App: React.FC = () => {
   const [history, setHistory] = useState<QuizResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Load history from localStorage on mount
   useEffect(() => {
     const savedHistory = localStorage.getItem('cinema_persona_history');
     if (savedHistory) {
@@ -31,11 +42,6 @@ const App: React.FC = () => {
       }
     }
   }, []);
-
-  const startQuiz = () => {
-    setUserAnswers([]);
-    setCurrentScreen(Screen.QUIZ);
-  };
 
   const handleQuizComplete = (answers: string[]) => {
     setUserAnswers(answers);
@@ -68,55 +74,48 @@ const App: React.FC = () => {
       localStorage.setItem('cinema_persona_history', JSON.stringify(newHistory));
       setCurrentScreen(Screen.RESULT);
     } catch (error) {
-      console.error("Quiz analysis failed", error);
-      alert("Something went wrong with the AI analysis. Please try again.");
+      console.error("Analysis failed", error);
+      alert("AI engine busy. Retrying...");
     } finally {
       setIsLoading(false);
     }
   };
 
-  const viewHistory = () => setCurrentScreen(Screen.HISTORY);
-  const goHome = () => setCurrentScreen(Screen.HOME);
-  const goBackToLanding = () => setCurrentScreen(Screen.LANDING);
+  const renderScreen = () => {
+    switch (currentScreen) {
+      case Screen.LANDING: return <Landing onStart={() => setCurrentScreen(Screen.HOME)} />;
+      case Screen.HOME: return <Home onStartQuiz={() => setCurrentScreen(Screen.QUIZ)} onViewHistory={() => setCurrentScreen(Screen.HISTORY)} />;
+      case Screen.QUIZ: return <Quiz onComplete={handleQuizComplete} onCancel={() => setCurrentScreen(Screen.HOME)} />;
+      case Screen.NAME_ENTRY: return <NameEntry onSubmit={handleNameSubmit} isLoading={isLoading} onBack={() => setCurrentScreen(Screen.QUIZ)} />;
+      case Screen.RESULT: return currentResult ? <Result result={currentResult} onRetake={() => setCurrentScreen(Screen.QUIZ)} onHome={() => setCurrentScreen(Screen.HOME)} /> : null;
+      case Screen.HISTORY: return <History items={history} onBack={() => setCurrentScreen(Screen.HOME)} onSelect={(res) => { setCurrentResult(res); setCurrentScreen(Screen.RESULT); }} />;
+      default: return <Landing onStart={() => setCurrentScreen(Screen.HOME)} />;
+    }
+  };
 
   return (
-    <div className="relative w-full h-screen max-w-md mx-auto overflow-hidden bg-background-dark text-white font-display">
-      {/* Background Ambient Effects */}
-      <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-primary/20 rounded-full blur-[100px]"></div>
-        <div className="absolute bottom-[-10%] right-[-10%] w-[400px] h-[400px] bg-blue-600/10 rounded-full blur-[100px]"></div>
-        <div className="absolute inset-0 bg-cinema-grain opacity-20 mix-blend-overlay"></div>
+    <div className="relative w-full h-screen max-w-md mx-auto overflow-hidden bg-background-dark text-[#e6e1e5]">
+      {/* Dynamic Background */}
+      <div className="absolute inset-0 z-0 pointer-events-none">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-[120px]"></div>
+        <div className="absolute bottom-0 left-0 w-80 h-80 bg-blue-500/5 rounded-full blur-[150px]"></div>
       </div>
 
-      <div className="relative z-10 flex flex-col h-full w-full">
-        {currentScreen === Screen.LANDING && <Landing onStart={() => setCurrentScreen(Screen.HOME)} />}
-        {currentScreen === Screen.HOME && <Home onStartQuiz={startQuiz} onViewHistory={viewHistory} />}
-        {currentScreen === Screen.QUIZ && <Quiz onComplete={handleQuizComplete} onCancel={goHome} />}
-        {currentScreen === Screen.NAME_ENTRY && (
-          <NameEntry 
-            onSubmit={handleNameSubmit} 
-            isLoading={isLoading} 
-            onBack={() => setCurrentScreen(Screen.QUIZ)} 
-          />
-        )}
-        {currentScreen === Screen.RESULT && currentResult && (
-          <Result 
-            result={currentResult} 
-            onRetake={startQuiz} 
-            onHome={goHome} 
-          />
-        )}
-        {currentScreen === Screen.HISTORY && (
-          <History 
-            items={history} 
-            onBack={goHome} 
-            onSelect={(res) => {
-              setCurrentResult(res);
-              setCurrentScreen(Screen.RESULT);
-            }} 
-          />
-        )}
-      </div>
+      <main className="relative z-10 h-full w-full">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentScreen}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            variants={screenVariants}
+            transition={springTransition}
+            className="h-full w-full"
+          >
+            {renderScreen()}
+          </motion.div>
+        </AnimatePresence>
+      </main>
     </div>
   );
 };

@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { QUESTIONS } from '../constants';
 
 interface QuizProps {
@@ -17,7 +18,6 @@ const Quiz: React.FC<QuizProps> = ({ onComplete, onCancel }) => {
 
   const handleNext = () => {
     if (!selectedOption) return;
-    
     const newAnswers = [...answers, selectedOption];
     if (currentIdx < QUESTIONS.length - 1) {
       setAnswers(newAnswers);
@@ -29,103 +29,93 @@ const Quiz: React.FC<QuizProps> = ({ onComplete, onCancel }) => {
   };
 
   return (
-    <div className="flex flex-col h-full w-full px-4 pb-6">
-      <header className="flex items-center justify-between pt-6 pb-2">
-        <button 
-          onClick={() => { if(currentIdx > 0) setCurrentIdx(currentIdx - 1); }}
-          className="flex items-center justify-center w-10 h-10 rounded-full bg-white/5 border border-white/10 text-white"
-        >
-          <span className="material-symbols-outlined text-[20px]">arrow_back</span>
+    <div className="flex flex-col h-full w-full bg-surface">
+      <header className="flex items-center h-16 px-4 shrink-0 bg-surface/80 backdrop-blur-md sticky top-0 z-20">
+        <button onClick={onCancel} className="size-12 flex items-center justify-center rounded-full active:bg-white/10 transition-colors">
+          <span className="material-symbols-outlined">close</span>
         </button>
-        <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10">
-          <span className="text-xs font-bold tracking-widest text-primary uppercase">Quiz</span>
+        <div className="flex-1 px-4">
+          <div className="h-1 w-full bg-surface-variant rounded-full overflow-hidden">
+            <motion.div 
+              className="h-full bg-primary"
+              initial={{ width: 0 }}
+              animate={{ width: `${progress}%` }}
+              transition={{ duration: 0.5 }}
+            />
+          </div>
         </div>
-        <button 
-          onClick={onCancel}
-          className="flex items-center justify-center w-10 h-10 rounded-full bg-white/5 border border-white/10 text-white"
-        >
-          <span className="material-symbols-outlined text-[20px]">close</span>
-        </button>
+        <span className="text-xs font-bold text-primary tabular-nums ml-2">
+          {currentIdx + 1}/{QUESTIONS.length}
+        </span>
       </header>
 
-      <div className="flex flex-col gap-2 py-4">
-        <div className="flex justify-between items-end mb-1 px-1">
-          <span className="text-white/60 text-sm font-medium font-body">Question {currentIdx + 1} of {QUESTIONS.length}</span>
-          <span className="text-primary text-xs font-bold tracking-wide">{Math.round(progress)}%</span>
-        </div>
-        <div className="flex w-full gap-1.5 h-1.5">
-          {QUESTIONS.map((_, i) => (
-            <div 
-              key={i} 
-              className={`h-full flex-1 rounded-full transition-all duration-500 ${
-                i < currentIdx ? 'bg-primary shadow-neon' : 
-                i === currentIdx ? 'bg-white animate-pulse' : 'bg-white/10'
-              }`}
-            />
-          ))}
-        </div>
-      </div>
-
-      <main className="flex-1 flex flex-col justify-center gap-6 py-2 overflow-y-auto no-scrollbar">
-        <div className="relative w-full rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 shadow-xl overflow-hidden">
-          <div 
-            className="h-44 w-full bg-cover bg-center relative" 
-            style={{ backgroundImage: `linear-gradient(180deg, rgba(34, 16, 28, 0) 0%, rgba(34, 16, 28, 0.8) 100%), url("${question.imageUrl}")` }}
+      <main className="flex-1 overflow-y-auto no-scrollbar p-5 pb-24">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentIdx}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.3 }}
           >
-            <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full border border-white/10">
-              <span className="text-[10px] font-bold tracking-wider text-white uppercase">{question.scenario}</span>
-            </div>
-          </div>
-          <div className="p-6 pt-2">
-            <h2 className="text-2xl font-bold leading-tight text-white mb-2">{question.text}</h2>
-            <p className="text-white/60 text-sm font-body">Choose the reaction that best fits your instinct.</p>
-          </div>
-        </div>
-
-        <div className="flex flex-col gap-3">
-          {question.options.map((opt) => (
-            <label 
-              key={opt.id}
-              className={`group relative flex items-center gap-4 rounded-xl p-4 cursor-pointer transition-all duration-300 border ${
-                selectedOption === opt.id ? 'border-primary bg-primary/10' : 'border-white/10 bg-white/5 hover:bg-white/10'
-              }`}
-            >
-              <input 
-                type="radio" 
-                name="quiz_option" 
-                className="sr-only" 
-                checked={selectedOption === opt.id}
-                onChange={() => setSelectedOption(opt.id)}
+            <div className="bg-[#2b2930] rounded-m3 overflow-hidden shadow-m3-1 mb-8">
+              <div 
+                className="h-48 w-full bg-cover bg-center"
+                style={{ backgroundImage: `url("${question.imageUrl}")` }}
               />
-              <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition-colors ${
-                selectedOption === opt.id ? 'bg-primary text-white' : 'bg-white/10 text-white'
-              }`}>
-                <span className="material-symbols-outlined text-[20px]">{opt.icon}</span>
+              <div className="p-6">
+                <span className="text-primary text-[10px] font-black tracking-widest uppercase mb-2 block">{question.scenario}</span>
+                <h2 className="text-2xl font-bold text-white leading-tight">{question.text}</h2>
               </div>
-              <span className={`grow text-white text-base font-bold transition-colors ${selectedOption === opt.id ? 'text-primary' : ''}`}>
-                {opt.text}
-              </span>
-              <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
-                selectedOption === opt.id ? 'border-primary bg-primary' : 'border-white/20'
-              }`}>
-                {selectedOption === opt.id && <span className="material-symbols-outlined text-[14px] text-black">check</span>}
-              </div>
-            </label>
-          ))}
-        </div>
+            </div>
+
+            <div className="flex flex-col gap-3">
+              {question.options.map((opt) => (
+                <button
+                  key={opt.id}
+                  onClick={() => setSelectedOption(opt.id)}
+                  className={`flex items-center gap-4 p-4 rounded-m3 transition-all border-2 text-left relative overflow-hidden group active:scale-[0.98] ${
+                    selectedOption === opt.id 
+                      ? 'bg-primary/10 border-primary' 
+                      : 'bg-glass border-white/5'
+                  }`}
+                >
+                  <div className={`size-10 rounded-full flex items-center justify-center shrink-0 ${
+                    selectedOption === opt.id ? 'bg-primary text-white' : 'bg-surface-variant text-white/70'
+                  }`}>
+                    <span className="material-symbols-outlined text-[20px]">{opt.icon}</span>
+                  </div>
+                  <span className={`text-base font-bold ${selectedOption === opt.id ? 'text-primary' : 'text-[#e6e1e5]'}`}>
+                    {opt.text}
+                  </span>
+                  <div className="absolute right-6 opacity-40">
+                    <div className={`size-6 rounded-full border-2 flex items-center justify-center ${
+                      selectedOption === opt.id ? 'border-primary bg-primary' : 'border-white/20'
+                    }`}>
+                      {selectedOption === opt.id && <span className="material-symbols-outlined text-[14px] text-white">check</span>}
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </motion.div>
+        </AnimatePresence>
       </main>
 
-      <footer className="mt-auto pt-4">
-        <button 
-          onClick={handleNext}
-          disabled={!selectedOption}
-          className={`w-full flex items-center justify-center gap-2 rounded-full h-14 transition-all text-white text-lg font-bold ${
-            selectedOption ? 'bg-primary shadow-neon active:scale-[0.98]' : 'bg-white/10 text-white/30 cursor-not-allowed'
-          }`}
-        >
-          <span>{currentIdx === QUESTIONS.length - 1 ? 'See Result' : 'Next Question'}</span>
-          <span className="material-symbols-outlined text-[20px]">arrow_forward</span>
-        </button>
+      <footer className="fixed bottom-0 left-0 right-0 p-5 bg-gradient-to-t from-surface via-surface to-transparent pointer-events-none">
+        <div className="max-w-md mx-auto pointer-events-auto">
+          <motion.button
+            whileTap={{ scale: 0.96 }}
+            disabled={!selectedOption}
+            onClick={handleNext}
+            className={`w-full h-16 rounded-m3 flex items-center justify-center gap-2 font-bold text-lg shadow-m3-2 transition-all ${
+              selectedOption ? 'bg-primary text-white' : 'bg-white/5 text-white/20 cursor-not-allowed'
+            }`}
+          >
+            <span>{currentIdx === QUESTIONS.length - 1 ? 'Reveal Persona' : 'Next Step'}</span>
+            <span className="material-symbols-outlined">chevron_right</span>
+          </motion.button>
+        </div>
       </footer>
     </div>
   );
