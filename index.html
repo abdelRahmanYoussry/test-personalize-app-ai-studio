@@ -3,109 +3,108 @@
 <html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cinema Persona</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Cinema Persona - Flutter Edition</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Noto+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             darkMode: "class",
             theme: {
                 extend: {
                     colors: {
-                        "primary": "#ee2bad",
-                        "primary-container": "#4d0033",
-                        "on-primary-container": "#ffd8eb",
-                        "surface": "#1d1b1e",
-                        "surface-variant": "#49454f",
-                        "background-dark": "#141218",
-                        "glass": "rgba(255, 255, 255, 0.04)",
-                        "glass-border": "rgba(255, 255, 255, 0.1)",
-                    },
-                    fontFamily: {
-                        "display": ["Space Grotesk", "sans-serif"],
-                        "body": ["Noto Sans", "sans-serif"]
+                        // Material 3 Dark Palette (Official Tonal Palettes)
+                        "m3-primary": "#D0BCFF",
+                        "m3-on-primary": "#381E72",
+                        "m3-primary-container": "#4F378B",
+                        "m3-on-primary-container": "#EADDFF",
+                        "m3-secondary": "#CCC2DC",
+                        "m3-on-secondary": "#332D41",
+                        "m3-secondary-container": "#4A4458",
+                        "m3-on-secondary-container": "#E8DEF8",
+                        "m3-surface": "#1C1B1F",
+                        "m3-on-surface": "#E6E1E5",
+                        "m3-surface-variant": "#49454F",
+                        "m3-on-surface-variant": "#CAC4D0",
+                        "m3-outline": "#938F99",
+                        "m3-background": "#141218",
+                        "m3-error": "#F2B8B5",
+                        "m3-on-error": "#601410",
                     },
                     borderRadius: {
-                        "m3": "28px",
+                        "m3-xs": "4px",
+                        "m3-sm": "8px",
+                        "m3-md": "12px",
+                        "m3-lg": "16px",
+                        "m3-xl": "28px",
+                        "m3-full": "9999px",
                     },
                     boxShadow: {
-                        "m3-1": "0 1px 3px 1px rgba(0,0,0,0.15), 0 1px 2px 0 rgba(0,0,0,0.3)",
-                        "m3-2": "0 2px 6px 2px rgba(0,0,0,0.15), 0 1px 2px 0 rgba(0,0,0,0.3)",
-                        "neon": "0 0 20px rgba(238, 43, 173, 0.4)",
-                    },
-                    animation: {
-                        'ripple': 'ripple 0.6s linear forwards',
-                        'fade-in': 'fade-in 0.5s ease-out',
-                        'float': 'float 6s ease-in-out infinite',
-                        'shimmer': 'shimmer 2s infinite linear',
-                        'scale-in': 'scale-in 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-                        'slide-up': 'slide-up 0.4s ease-out'
-                    },
-                    keyframes: {
-                        ripple: {
-                            '0%': { transform: 'scale(0)', opacity: '0.35' },
-                            '100%': { transform: 'scale(4)', opacity: '0' },
-                        },
-                        'fade-in': {
-                            '0%': { opacity: '0' },
-                            '100%': { opacity: '1' },
-                        },
-                        float: {
-                            '0%, 100%': { transform: 'translateY(0px)' },
-                            '50%': { transform: 'translateY(-10px)' },
-                        },
-                        shimmer: {
-                            '0%': { transform: 'translateX(-150%) skewX(-12deg)' },
-                            '100%': { transform: 'translateX(150%) skewX(-12deg)' },
-                        },
-                        'scale-in': {
-                            '0%': { transform: 'scale(0.9)', opacity: '0' },
-                            '100%': { transform: 'scale(1)', opacity: '1' },
-                        },
-                        'slide-up': {
-                            '0%': { transform: 'translateY(20px)', opacity: '0' },
-                            '100%': { transform: 'translateY(0)', opacity: '1' },
-                        }
+                        "m3-1": "0px 1px 3px 1px rgba(0,0,0,0.15), 0px 1px 2px 0px rgba(0,0,0,0.30)",
+                        "m3-2": "0px 2px 6px 2px rgba(0,0,0,0.15), 0px 1px 2px 0px rgba(0,0,0,0.30)",
+                        "m3-3": "0px 1px 3px 0px rgba(0,0,0,0.30), 0px 4px 8px 3px rgba(0,0,0,0.15)",
                     }
-                },
-            },
+                }
+            }
         }
     </script>
     <style>
         body {
-            background-color: #141218;
-            color: #e6e1e5;
+            background-color: #000;
+            color: #E6E1E5;
+            font-family: 'Roboto', sans-serif;
             margin: 0;
             padding: 0;
-            font-family: 'Noto Sans', sans-serif;
             overflow: hidden;
+            user-select: none;
             -webkit-tap-highlight-color: transparent;
         }
-        .m3-card {
-            background-color: rgba(255, 255, 255, 0.05);
-            border-radius: 28px;
-            transition: background-color 0.2s;
+        
+        /* Material 3 Typography */
+        .m3-display-large { font-family: 'Space Grotesk', sans-serif; font-size: 57px; line-height: 64px; letter-spacing: -0.25px; font-weight: 500; }
+        .m3-headline-medium { font-family: 'Space Grotesk', sans-serif; font-size: 28px; line-height: 36px; font-weight: 500; }
+        .m3-title-large { font-size: 22px; line-height: 28px; font-weight: 500; }
+        .m3-label-large { font-size: 14px; line-height: 20px; font-weight: 500; letter-spacing: 0.1px; }
+        .m3-body-medium { font-size: 14px; line-height: 20px; font-weight: 400; letter-spacing: 0.25px; }
+
+        .flutter-container {
+            width: 100%;
+            height: 100vh;
+            max-width: 450px;
+            margin: 0 auto;
+            background-color: #141218;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
-        .m3-card:active {
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-        .text-glow {
-            text-shadow: 0 0 15px rgba(238, 43, 173, 0.5);
-        }
-        ::-webkit-scrollbar {
-            width: 0px;
-            background: transparent;
-        }
-        .no-scrollbar {
-            -ms-overflow-style: none;
+
+        .flutter-scroll {
+            overflow-y: auto;
             scrollbar-width: none;
+            -ms-overflow-style: none;
         }
+        .flutter-scroll::-webkit-scrollbar { display: none; }
+
+        .m3-state-layer {
+            position: relative;
+            overflow: hidden;
+        }
+        .m3-state-layer::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-color: currentColor;
+            opacity: 0;
+            transition: opacity 0.2s;
+            pointer-events: none;
+        }
+        .m3-state-layer:active::after { opacity: 0.12; }
     </style>
-<script type="importmap">
+    <script type="importmap">
 {
   "imports": {
     "react": "https://esm.sh/react@19.0.0",
